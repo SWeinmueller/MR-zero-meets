@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Image Comparison Slider</title>
+  <title>Image Comparison Slider (No Scaling)</title>
   <style>
     body {
       margin: 0;
@@ -14,51 +14,43 @@
       height: 100vh;
     }
 
-    /* Set the container to the exact dimensions of your images if possible. 
-       For demonstration, assume the images are 800x500 or similar ratio. */
     .comparison-container {
       position: relative;
-      width: 800px;
-      height: 500px;
-      overflow: hidden;
+      display: inline-block; /* Shrink-wrap to content size */
+      vertical-align: middle;
     }
 
-    /* Left Image: placed in the container, absolutely positioned */
-    .comparison-container .left-image {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: auto;
+    .comparison-container img {
       display: block;
+      max-width: none; /* Do not constrain images */
+      height: auto;
     }
 
-    /* Overlay container: clips the right image */
+    .left-image {
+      position: relative;
+      z-index: 1;
+    }
+
     .overlay {
       position: absolute;
       top: 0;
       left: 0;
-      width: 50%; /* initial position */
-      height: 100%;
       overflow: hidden;
     }
 
-    /* Right Image: also absolutely positioned with the same scaling */
     .overlay .right-image {
+      display: block;
+      max-width: none; /* No scaling */
+      height: auto;
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: auto;
-      display: block;
     }
 
-    /* Slider Handle: vertical bar that moves horizontally */
     .slider-handle {
       position: absolute;
       top: 0;
       bottom: 0;
-      left: 50%; /* initial position in the middle */
       width: 5px;
       background-color: #fff;
       border-left: 2px solid #000;
@@ -70,39 +62,58 @@
 </head>
 <body>
   <div class="comparison-container">
-    <!-- Left image -->
-    <img src="image1.jpg" alt="Left Image" class="left-image">
+    <!-- Left image. Adjust to your actual image path -->
+    <img src="image1.jpg" alt="Left Image" class="left-image" onload="initializeSlider()">
 
-    <!-- Overlay with the right image -->
     <div class="overlay">
+      <!-- Right image. Adjust to your actual image path -->
       <img src="image2.jpg" alt="Right Image" class="right-image">
     </div>
 
-    <!-- Slider Handle -->
     <div class="slider-handle"></div>
   </div>
 
   <script>
-    const sliderHandle = document.querySelector('.slider-handle');
-    const overlay = document.querySelector('.overlay');
     const container = document.querySelector('.comparison-container');
+    const leftImage = document.querySelector('.left-image');
+    const rightImage = document.querySelector('.right-image');
+    const overlay = document.querySelector('.overlay');
+    const sliderHandle = document.querySelector('.slider-handle');
 
     let isDragging = false;
 
-    function slide(event) {
+    function initializeSlider() {
+      // Once the left image is loaded, we know its natural width/height
+      const width = leftImage.naturalWidth;
+      const height = leftImage.naturalHeight;
+
+      // Set container size to match the image size exactly
+      container.style.width = width + 'px';
+      container.style.height = height + 'px';
+
+      // Position right image the same size as left image
+      rightImage.style.width = width + 'px';
+      rightImage.style.height = 'auto';
+
+      // Set initial overlay to half width
+      overlay.style.width = (width / 2) + 'px';
+      overlay.style.height = height + 'px';
+
+      // Position the handle in the middle
+      sliderHandle.style.left = (width / 2) + 'px';
+    }
+
+    function slide(e) {
       if (!isDragging) return;
 
       const rect = container.getBoundingClientRect();
-      const offsetX = event.clientX !== undefined 
-        ? event.clientX 
-        : event.touches[0].clientX;
+      const offsetX = (e.clientX !== undefined) ? e.clientX : e.touches[0].clientX;
       let position = offsetX - rect.left;
 
-      // Constrain slider within the container
+      // Constrain position within the container
       if (position < 0) position = 0;
       if (position > rect.width) position = rect.width;
 
-      // Update overlay and slider handle position
       overlay.style.width = position + 'px';
       sliderHandle.style.left = position + 'px';
     }
@@ -117,4 +128,4 @@
     window.addEventListener('touchend', () => isDragging = false);
   </script>
 </body>
-</html>
+  </html>
