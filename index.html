@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Comparison Slider</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+    }
+
+    .comparison-container {
+      position: relative;
+      width: 90%;
+      max-width: 800px;
+      height: 400px;
+      overflow: hidden;
+    }
+
+    .comparison-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .comparison-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .overlay {
+      width: 50%; /* Default slider position */
+      overflow: hidden;
+    }
+
+    .slider-handle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%; /* Default slider position */
+      width: 5px;
+      background-color: #fff;
+      border-left: 2px solid #000;
+      border-right: 2px solid #000;
+      cursor: ew-resize;
+      z-index: 2;
+      transition: 0.3s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="comparison-container">
+    <div class="comparison-image">
+      <img src="image1.jpg" alt="Before Image">
+    </div>
+    <div class="comparison-image overlay">
+      <img src="image2.jpg" alt="After Image">
+    </div>
+    <div class="slider-handle"></div>
+  </div>
+
+  <script>
+    const sliderHandle = document.querySelector('.slider-handle');
+    const overlay = document.querySelector('.overlay');
+    const container = document.querySelector('.comparison-container');
+
+    let isDragging = false;
+
+    // Update slider position
+    function slide(event) {
+      if (!isDragging) return;
+
+      // Get mouse or touch position
+      const rect = container.getBoundingClientRect();
+      const offsetX = event.clientX || event.touches[0].clientX;
+      let position = offsetX - rect.left;
+
+      // Constrain the slider within the container
+      if (position < 0) position = 0;
+      if (position > rect.width) position = rect.width;
+
+      // Set the new slider position
+      sliderHandle.style.left = `${position}px`;
+      overlay.style.width = `${position}px`;
+    }
+
+    // Start dragging
+    sliderHandle.addEventListener('mousedown', () => (isDragging = true));
+    sliderHandle.addEventListener('touchstart', () => (isDragging = true));
+
+    // Stop dragging
+    window.addEventListener('mouseup', () => (isDragging = false));
+    window.addEventListener('touchend', () => (isDragging = false));
+
+    // Dragging event listener
+    window.addEventListener('mousemove', slide);
+    window.addEventListener('touchmove', slide);
+  </script>
+</body>
+  </html>
