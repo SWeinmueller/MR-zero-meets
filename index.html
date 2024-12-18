@@ -1,138 +1,135 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<style>
+* {box-sizing:border-box;}
 
-        body {
-            max-width: 100%;
-            overflow-x: hidden;
-        }
+.img-comp-container {
+  position: relative;
+  height: 768px; /*should be the same height as the images*/
+}
 
-        .img-comp-container {
-            position: relative;
-            width: 100%;
-            max-width: 886px;
-            margin: 0 auto;
-            height: auto;
-        }
+.img-comp-img {
+  position: absolute;
+  width: auto;
+  height: auto;
+  overflow:hidden;
+}
 
-        .img-comp-img {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-        }
+.img-comp-img img {
+  display:block;
+  vertical-align:middle;
+}
 
-        .img-comp-img img {
-            display: block;
-            width: 100%;
-            height: auto;
-            max-width: 100%;
-            object-fit: contain;
-        }
-
-        .img-comp-slider {
-            position: absolute;
-            z-index: 9;
-            cursor: ew-resize;
-            width: 40px;
-            height: 40px;
-            background-color: #2196F3;
-            opacity: 0.7;
-            border-radius: 50%;
-            border: 3px solid #fff;
-        }
-
-        @media (max-width: 600px) {
-            .img-comp-slider {
-                width: 30px;
-                height: 30px;
-            }
-        }
-    </style>
+.img-comp-slider {
+  position: absolute;
+  z-index:9;
+  cursor: ew-resize;
+  /*make the slider look like a circle:*/
+  width: 40px;
+  height: 40px;
+  background-color: #2196F3;
+  opacity: 0.7;
+  border-radius: 50%;
+  border: 3px solid #fff;
+}
+</style>
 </head>
 <body>
-    <h1>MR-zero meets ... </h1>
-    <p>3D FLAIR TSE</p>
-    ORIGINAL ----------------------------------I------------------------------------------IMPROVED
-    <div class="img-comp-container">
-        <div class="img-comp-img">
-            <img src="image2.jpg" alt="First Image">
-        </div>
-        <div class="img-comp-img img-comp-overlay">
-            <img src="image1.jpg" alt="Second Image">
-        </div>
-    </div>
 
-    <script>
-        function initComparisons() {
-            var x = document.getElementsByClassName("img-comp-overlay");
-            for (var i = 0; i < x.length; i++) {
-                compareImages(x[i]);
-            }
+<h1>MR-zero meets ... </h1>
+<p>3D FLAIR TSE</p>
+ORIGINAL ---------------------------I-------------------------------- IMPROVED
+<div class="img-comp-container">
+  <div class="img-comp-img">
+    <img src="image2.jpg" width="886" height="768">
+  </div>
+  <div class="img-comp-img img-comp-overlay">
+    <img src="image1.jpg" width="886" height="768">
+  </div>
+</div>
 
-            function compareImages(img) {
-                var slider, clicked = 0, w, h;
-                w = img.offsetWidth;
-                h = img.offsetHeight;
-                img.style.width = (w / 2) + "px";
+<script>
+function initComparisons() {
+  var x, i;
+  /*find all elements with an "img-comp-overlay" class:*/
+  x = document.getElementsByClassName("img-comp-overlay");
+  for (i = 0; i < x.length; i++) {
+    compareImages(x[i]);
+  }
+  function compareImages(img) {
+    var slider, clicked = 0, w, h;
+    /*get the width and height of the img element*/
+    w = img.offsetWidth;
+    h = img.offsetHeight;
+    /*set the width of the img element to 50%:*/
+    img.style.width = (w / 2) + "px";
+    /*create slider:*/
+    slider = document.createElement("DIV");
+    slider.setAttribute("class", "img-comp-slider");
+    /*insert slider*/
+    img.parentElement.insertBefore(slider, img);
+    /*position the slider in the middle:*/
+    slider.style.top = (h / 1.1) - (slider.offsetHeight / 2) + "px";
+    slider.style.left = (w / 2) - (slider.offsetWidth / 2) + "px";
+    /*execute a function when the mouse button is pressed:*/
+    slider.addEventListener("mousedown", slideReady);
+    /*and another function when the mouse button is released:*/
+    window.addEventListener("mouseup", slideFinish);
+    /*or touched (for touch screens:*/
+    slider.addEventListener("touchstart", slideReady);
+     /*and released (for touch screens:*/
+    window.addEventListener("touchend", slideFinish);
+    function slideReady(e) {
+      /*prevent any other actions that may occur when moving over the image:*/
+      e.preventDefault();
+      clicked = 1;
+      /*execute a function when the slider is moved:*/
+      window.addEventListener("mousemove", slideMove);
+      window.addEventListener("touchmove", slideMove);
+    }
+    function slideFinish() {
+      /*the slider is no longer clicked:*/
+      clicked = 0;
+      window.removeEventListener("mousemove", slideMove);
+      window.removeEventListener("touchmove", slideMove);
+    }
+    function slideMove(e) {
+      var pos;
+      /*if the slider is no longer clicked, exit this function:*/
+      //if (clicked == 0) return false;
+      /*get the cursor's x position:*/
+      pos = getCursorPos(e)
+      /*prevent the slider from sliding outside the image:*/
+      if (pos < 0) pos = 0;
+      if (pos > w) pos = w;
+      /*execute a function that will resize the overlay image according to the cursor:*/
+      slide(pos);
+    }
+    function getCursorPos(e) {
+      var a, x = 0;
+      e = e || window.event;
+      /*get the x positions of the image:*/
+      a = img.getBoundingClientRect();
+      /*calculate the cursor's x coordinate, relative to the image:*/
+      x = e.pageX - a.left;
+      x = x - window.pageXOffset;
+      return x;
+    }
+    function slide(x) {
+      /*resize the image:*/
+      img.style.width = x + "px";
+      /*position the slider:*/
+      slider.style.left = (img.offsetWidth - (slider.offsetWidth / 2)) + "px";
+    }
+  }
+}
 
-                slider = document.createElement("DIV");
-                slider.setAttribute("class", "img-comp-slider");
-                img.parentElement.insertBefore(slider, img);
+/*execute a function when the page is fully loaded:*/
+window.onload = function() {
+  initComparisons();
+}
+</script>
 
-                // Adjust slider positioning for responsiveness
-                slider.style.top = (h / 2) - (slider.offsetHeight / 2) + "px";
-                slider.style.left = (w / 2) - (slider.offsetWidth / 2) + "px";
-
-                // Add touch and mouse event listeners
-                slider.addEventListener("mousedown", slideReady);
-                slider.addEventListener("touchstart", slideReady);
-                window.addEventListener("mouseup", slideFinish);
-                window.addEventListener("touchend", slideFinish);
-
-                function slideReady(e) {
-                    e.preventDefault();
-                    clicked = 1;
-                    window.addEventListener("mousemove", slideMove);
-                    window.addEventListener("touchmove", slideMove);
-                }
-
-                function slideFinish() {
-                    clicked = 0;
-                    window.removeEventListener("mousemove", slideMove);
-                    window.removeEventListener("touchmove", slideMove);
-                }
-
-                function slideMove(e) {
-                    var pos = getCursorPos(e);
-                    pos = Math.max(0, Math.min(pos, w));
-                    slide(pos);
-                }
-
-                function getCursorPos(e) {
-                    var a = img.getBoundingClientRect();
-                    var x = 0;
-                    e = e.touches ? e.touches[0] : e;
-                    x = e.pageX - a.left - window.pageXOffset;
-                    return x;
-                }
-
-                function slide(x) {
-                    img.style.width = x + "px";
-                    slider.style.left = (x - slider.offsetWidth / 2) + "px";
-                }
-            }
-        }
-
-        window.addEventListener('load', initComparisons);
-        window.addEventListener('resize', initComparisons);
-    </script>
 </body>
 </html>
