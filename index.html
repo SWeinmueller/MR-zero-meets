@@ -7,52 +7,58 @@
   <style>
     body {
       margin: 0;
+      background-color: #333;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background-color: #333;
     }
 
+    /* Set the container to the exact dimensions of your images if possible. 
+       For demonstration, assume the images are 800x500 or similar ratio. */
     .comparison-container {
       position: relative;
-      width: 90%;
-      max-width: 800px;
+      width: 800px;
       height: 500px;
       overflow: hidden;
     }
 
-    /* Left Image as background */
-    .comparison-image {
+    /* Left Image: placed in the container, absolutely positioned */
+    .comparison-container .left-image {
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: url('image1.jpg');
-      background-size: cover;
-      background-position: center;
+      width: 100%;
+      height: auto;
+      display: block;
     }
 
-    /* Overlay for the Right Image */
+    /* Overlay container: clips the right image */
     .overlay {
       position: absolute;
       top: 0;
       left: 0;
+      width: 50%; /* initial position */
       height: 100%;
-      width: 50%; /* Initial position of the slider */
       overflow: hidden;
-      background-image: url('image2.jpg');
-      background-size: cover;
-      background-position: center;
     }
 
-    /* Slider Handle */
+    /* Right Image: also absolutely positioned with the same scaling */
+    .overlay .right-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Slider Handle: vertical bar that moves horizontally */
     .slider-handle {
       position: absolute;
       top: 0;
       bottom: 0;
-      left: 50%; /* Initial position */
+      left: 50%; /* initial position in the middle */
       width: 5px;
       background-color: #fff;
       border-left: 2px solid #000;
@@ -64,8 +70,15 @@
 </head>
 <body>
   <div class="comparison-container">
-    <div class="comparison-image"></div>
-    <div class="overlay"></div>
+    <!-- Left image -->
+    <img src="image1.jpg" alt="Left Image" class="left-image">
+
+    <!-- Overlay with the right image -->
+    <div class="overlay">
+      <img src="image2.jpg" alt="Right Image" class="right-image">
+    </div>
+
+    <!-- Slider Handle -->
     <div class="slider-handle"></div>
   </div>
 
@@ -78,16 +91,18 @@
 
     function slide(event) {
       if (!isDragging) return;
-      
+
       const rect = container.getBoundingClientRect();
-      const offsetX = event.clientX !== undefined ? event.clientX : event.touches[0].clientX;
+      const offsetX = event.clientX !== undefined 
+        ? event.clientX 
+        : event.touches[0].clientX;
       let position = offsetX - rect.left;
 
-      // Constrain slider within container width
+      // Constrain slider within the container
       if (position < 0) position = 0;
       if (position > rect.width) position = rect.width;
 
-      // Update overlay width & handle position
+      // Update overlay and slider handle position
       overlay.style.width = position + 'px';
       sliderHandle.style.left = position + 'px';
     }
