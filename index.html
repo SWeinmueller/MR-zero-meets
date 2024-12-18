@@ -1,31 +1,68 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-* {box-sizing:border-box;}
+* {
+  box-sizing: border-box;
+}
 
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #333;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+h1 {
+  margin: 20px 0;
+}
+
+p {
+  margin-bottom: 20px;
+}
+
+/* The container with a max-width for scaling down on smaller screens */
 .img-comp-container {
   position: relative;
-  height: 768px; /*should be the same height as the images*/
+  width: 100%;
+  max-width: 886px; /* Adjust this to match your largest image width */
+  height: auto; /* Height will scale based on image aspect ratio */
 }
 
+/* Base styling for images. They will scale to the container width. */
+.img-comp-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Positioning for the image comparison elements */
 .img-comp-img {
   position: absolute;
-  width: auto;
-  height: auto;
-  overflow:hidden;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
 }
 
-.img-comp-img img {
-  display:block;
-  vertical-align:middle;
+/* The overlay container must have .img-comp-overlay class */
+.img-comp-overlay {
+  width: 50%; /* Start at 50%, will be adjusted by JS */
 }
 
+/* The slider handle */
 .img-comp-slider {
   position: absolute;
   z-index:9;
   cursor: ew-resize;
-  /*make the slider look like a circle:*/
   width: 40px;
   height: 40px;
   background-color: #2196F3;
@@ -37,98 +74,111 @@
 </head>
 <body>
 
-<h1>Image Comparison</h1>
-<p>Mouse over the image:</p>
+<h1>Responsive Image Comparison</h1>
+<p>Drag the circle to compare the images. This version is responsive and works on mobile.</p>
 
 <div class="img-comp-container">
   <div class="img-comp-img">
-    <img src="image1.jpg" width="886" height="768">
+    <!-- Remove width/height attributes from the image -->
+    <img src="image1.jpg" alt="Image 1">
   </div>
   <div class="img-comp-img img-comp-overlay">
-    <img src="image2.jpg" width="886" height="768">
+    <img src="image2.jpg" alt="Image 2">
   </div>
 </div>
 
 <script>
 function initComparisons() {
-  var x, i;
-  /*find all elements with an "img-comp-overlay" class:*/
-  x = document.getElementsByClassName("img-comp-overlay");
-  for (i = 0; i < x.length; i++) {
+  var x = document.getElementsByClassName("img-comp-overlay");
+  for (var i = 0; i < x.length; i++) {
     compareImages(x[i]);
   }
+
   function compareImages(img) {
     var slider, clicked = 0, w, h;
-    /*get the width and height of the img element*/
+
+    /* Get the width and height of the img element after it has rendered */
     w = img.offsetWidth;
     h = img.offsetHeight;
-    /*set the width of the img element to 50%:*/
+
+    /* Set the width of the overlay image to 50% of its container */
     img.style.width = (w / 2) + "px";
-    /*create slider:*/
+
+    /* Create slider */
     slider = document.createElement("DIV");
     slider.setAttribute("class", "img-comp-slider");
-    /*insert slider*/
+
+    /* Insert slider before the img-comp-overlay img element */
     img.parentElement.insertBefore(slider, img);
-    /*position the slider in the middle:*/
+
+    /* Position the slider in the middle */
     slider.style.top = (h / 2) - (slider.offsetHeight / 2) + "px";
     slider.style.left = (w / 2) - (slider.offsetWidth / 2) + "px";
-    /*execute a function when the mouse button is pressed:*/
+
+    /* Mouse down and touch start events */
     slider.addEventListener("mousedown", slideReady);
-    /*and another function when the mouse button is released:*/
-    window.addEventListener("mouseup", slideFinish);
-    /*or touched (for touch screens:*/
     slider.addEventListener("touchstart", slideReady);
-     /*and released (for touch screens:*/
+
+    /* Mouse up and touch end events on window to end sliding */
+    window.addEventListener("mouseup", slideFinish);
     window.addEventListener("touchend", slideFinish);
+
     function slideReady(e) {
-      /*prevent any other actions that may occur when moving over the image:*/
       e.preventDefault();
       clicked = 1;
-      /*execute a function when the slider is moved:*/
       window.addEventListener("mousemove", slideMove);
       window.addEventListener("touchmove", slideMove);
     }
+
     function slideFinish() {
-      /*the slider is no longer clicked:*/
       clicked = 0;
       window.removeEventListener("mousemove", slideMove);
       window.removeEventListener("touchmove", slideMove);
     }
+
     function slideMove(e) {
-      var pos;
-      /*if the slider is no longer clicked, exit this function:*/
       if (clicked == 0) return false;
-      /*get the cursor's x position:*/
-      pos = getCursorPos(e)
-      /*prevent the slider from sliding outside the image:*/
+      var pos = getCursorPos(e);
       if (pos < 0) pos = 0;
       if (pos > w) pos = w;
-      /*execute a function that will resize the overlay image according to the cursor:*/
       slide(pos);
     }
+
     function getCursorPos(e) {
-      var a, x = 0;
       e = e || window.event;
-      /*get the x positions of the image:*/
-      a = img.getBoundingClientRect();
-      /*calculate the cursor's x coordinate, relative to the image:*/
-      x = e.pageX - a.left;
+      var a = img.getBoundingClientRect();
+      var x = e.pageX - a.left;
       x = x - window.pageXOffset;
       return x;
     }
+
     function slide(x) {
-      /*resize the image:*/
       img.style.width = x + "px";
-      /*position the slider:*/
       slider.style.left = (img.offsetWidth - (slider.offsetWidth / 2)) + "px";
     }
   }
 }
 
-/*execute a function when the page is fully loaded:*/
+/* Run comparisons once images are loaded */
 window.onload = function() {
   initComparisons();
-}
+};
+
+/* Re-initialize on window resize to handle orientation changes */
+window.addEventListener('resize', function() {
+  /* Remove old sliders and inline widths before re-init */
+  var sliders = document.getElementsByClassName('img-comp-slider');
+  while (sliders.length > 0) {
+    sliders[0].parentNode.removeChild(sliders[0]);
+  }
+
+  var overlays = document.getElementsByClassName('img-comp-overlay');
+  for (var i = 0; i < overlays.length; i++) {
+    overlays[i].style.width = "";
+  }
+
+  initComparisons();
+});
 </script>
 
 </body>
