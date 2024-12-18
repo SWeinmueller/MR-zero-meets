@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Image Comparison Slider</title>
   <style>
     body {
@@ -22,31 +22,29 @@
       overflow: hidden;
     }
 
-    /* Full-size Left Image */
+    /* Left Image as background */
     .comparison-image {
       position: absolute;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      right: 0;
+      bottom: 0;
+      background-image: url('image1.jpg');
+      background-size: cover;
+      background-position: center;
     }
 
-    /* Overlay Image Container */
+    /* Overlay for the Right Image */
     .overlay {
       position: absolute;
       top: 0;
       left: 0;
-      width: 50%; /* Default position of slider */
       height: 100%;
+      width: 50%; /* Initial position of the slider */
       overflow: hidden;
-    }
-
-    /* Both images: full-size */
-    img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      background-image: url('image2.jpg');
+      background-size: cover;
+      background-position: center;
     }
 
     /* Slider Handle */
@@ -54,7 +52,7 @@
       position: absolute;
       top: 0;
       bottom: 0;
-      left: 50%; /* Default position */
+      left: 50%; /* Initial position */
       width: 5px;
       background-color: #fff;
       border-left: 2px solid #000;
@@ -66,17 +64,8 @@
 </head>
 <body>
   <div class="comparison-container">
-    <!-- Full-size Left Image (Background) -->
-    <div class="comparison-image">
-      <img src="image1.jpg" alt="Left Image">
-    </div>
-
-    <!-- Overlay with Right Image -->
-    <div class="overlay">
-      <img src="image2.jpg" alt="Right Image">
-    </div>
-
-    <!-- Slider Handle -->
+    <div class="comparison-image"></div>
+    <div class="overlay"></div>
     <div class="slider-handle"></div>
   </div>
 
@@ -89,21 +78,20 @@
 
     function slide(event) {
       if (!isDragging) return;
-
-      // Get position relative to the container
+      
       const rect = container.getBoundingClientRect();
-      const offsetX = event.clientX || event.touches[0].clientX;
+      const offsetX = event.clientX !== undefined ? event.clientX : event.touches[0].clientX;
       let position = offsetX - rect.left;
 
-      // Constrain slider within container bounds
-      position = Math.max(0, Math.min(position, rect.width));
+      // Constrain slider within container width
+      if (position < 0) position = 0;
+      if (position > rect.width) position = rect.width;
 
-      // Update slider position and overlay width
-      sliderHandle.style.left = `${position}px`;
-      overlay.style.width = `${position}px`;
+      // Update overlay width & handle position
+      overlay.style.width = position + 'px';
+      sliderHandle.style.left = position + 'px';
     }
 
-    // Event listeners for slider handle
     sliderHandle.addEventListener('mousedown', () => isDragging = true);
     sliderHandle.addEventListener('touchstart', () => isDragging = true);
 
