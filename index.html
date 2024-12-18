@@ -70,7 +70,7 @@ function initComparisons() {
     /*insert slider*/
     img.parentElement.insertBefore(slider, img);
     /*position the slider in the middle:*/
-    slider.style.top = (h / 10) - (slider.offsetHeight / 2) + "px";
+    slider.style.top = (h / 0.01) - (slider.offsetHeight / 2) + "px";
     slider.style.left = (w / 2) - (slider.offsetWidth / 2) + "px";
     /*execute a function when the mouse button is pressed:*/
     slider.addEventListener("mousedown", slideReady);
@@ -97,7 +97,7 @@ function initComparisons() {
     function slideMove(e) {
       var pos;
       /*if the slider is no longer clicked, exit this function:*/
-      if (clicked == 0) return false;
+      //if (clicked == 0) return false;
       /*get the cursor's x position:*/
       pos = getCursorPos(e)
       /*prevent the slider from sliding outside the image:*/
