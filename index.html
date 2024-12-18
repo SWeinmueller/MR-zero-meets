@@ -3,129 +3,161 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Image Comparison Slider (No Scaling)</title>
+  <title>Image Comparison Slider</title>
   <style>
-    body {
-      margin: 0;
-      background-color: #333;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .comparison-container {
+    /* Container around the images */
+    .img-comp-container {
       position: relative;
-      display: inline-block; /* Shrink-wrap to content size */
-      vertical-align: middle;
+      height: 200px; /* Adjust to match your images */
+      width: 300px;  /* Adjust to match your images */
+      overflow: hidden; /* Hide anything that spills out */
     }
 
-    .comparison-container img {
+    /* The first image */
+    .img-comp-img {
+      position: absolute;
+      width: auto;
+      height: auto;
+      top: 0;
+      left: 0;
+    }
+
+    .img-comp-img img {
       display: block;
-      max-width: none; /* Do not constrain images */
+      max-width: 100%;
       height: auto;
     }
 
-    .left-image {
-      position: relative;
-      z-index: 1;
-    }
-
-    .overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
+    /* Overlay image */
+    .img-comp-overlay {
+      width: 50%; /* Start with 50% width */
       overflow: hidden;
     }
 
-    .overlay .right-image {
-      display: block;
-      max-width: none; /* No scaling */
-      height: auto;
+    /* Slider handle */
+    .img-comp-slider {
       position: absolute;
-      top: 0;
-      left: 0;
-    }
-
-    .slider-handle {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 5px;
-      background-color: #fff;
-      border-left: 2px solid #000;
-      border-right: 2px solid #000;
+      z-index: 9;
       cursor: ew-resize;
-      z-index: 10;
+      width: 40px;
+      height: 40px;
+      background-color: #2196F3;
+      opacity: 0.7;
+      border-radius: 50%;
+      border: 3px solid #fff;
     }
   </style>
 </head>
 <body>
-  <div class="comparison-container">
-    <!-- Left image. Adjust to your actual image path -->
-    <img src="image1.jpg" alt="Left Image" class="left-image" onload="initializeSlider()">
 
-    <div class="overlay">
-      <!-- Right image. Adjust to your actual image path -->
-      <img src="image2.jpg" alt="Right Image" class="right-image">
-    </div>
-
-    <div class="slider-handle"></div>
+<div class="img-comp-container">
+  <!-- Left (base) image -->
+  <div class="img-comp-img">
+    <img src="image1.jpg" alt="Left Image">
   </div>
 
-  <script>
-    const container = document.querySelector('.comparison-container');
-    const leftImage = document.querySelector('.left-image');
-    const rightImage = document.querySelector('.right-image');
-    const overlay = document.querySelector('.overlay');
-    const sliderHandle = document.querySelector('.slider-handle');
+  <!-- Right (overlay) image -->
+  <div class="img-comp-img img-comp-overlay">
+    <img src="image2.jpg" alt="Right Image">
+  </div>
+</div>
 
-    let isDragging = false;
+<script>
+function initComparisons() {
+  var x, i;
+  /* Find all elements with an "img-comp-overlay" class: */
+  x = document.getElementsByClassName("img-comp-overlay");
+  for (i = 0; i < x.length; i++) {
+    compareImages(x[i]);
+  }
 
-    function initializeSlider() {
-      // Once the left image is loaded, we know its natural width/height
-      const width = leftImage.naturalWidth;
-      const height = leftImage.naturalHeight;
+  function compareImages(img) {
+    var slider, w, h, clicked = 0;
 
-      // Set container size to match the image size exactly
-      container.style.width = width + 'px';
-      container.style.height = height + 'px';
+    /* Get the width and height of the img element */
+    w = img.offsetWidth;
+    h = img.offsetHeight;
 
-      // Position right image the same size as left image
-      rightImage.style.width = width + 'px';
-      rightImage.style.height = 'auto';
+    /* Set the width of the img element to 50% */
+    img.style.width = (w / 2) + "px";
 
-      // Set initial overlay to half width
-      overlay.style.width = (width / 2) + 'px';
-      overlay.style.height = height + 'px';
+    /* Create slider */
+    slider = document.createElement("DIV");
+    slider.setAttribute("class", "img-comp-slider");
 
-      // Position the handle in the middle
-      sliderHandle.style.left = (width / 2) + 'px';
+    /* Insert slider */
+    img.parentElement.insertBefore(slider, img);
+
+    /* Position the slider in the middle */
+    slider.style.top = (h / 2) - (slider.offsetHeight / 2) + "px";
+    slider.style.left = (w / 2) - (slider.offsetWidth / 2) + "px";
+
+    /* Execute a function when the mouse button is pressed */
+    slider.addEventListener("mousedown", slideReady);
+    /* And another function when the mouse button is released */
+    window.addEventListener("mouseup", slideFinish);
+
+    /* Or touched (for touch screens) */
+    slider.addEventListener("touchstart", slideReady);
+    /* And released (for touch screens) */
+    window.addEventListener("touchend", slideFinish);
+
+    function slideReady(e) {
+      /* Prevent any other actions that may occur when moving over the image */
+      e.preventDefault();
+      clicked = 1;
+
+      /* Execute a function when the slider is moved */
+      window.addEventListener("mousemove", slideMove);
+      window.addEventListener("touchmove", slideMove);
     }
 
-    function slide(e) {
-      if (!isDragging) return;
-
-      const rect = container.getBoundingClientRect();
-      const offsetX = (e.clientX !== undefined) ? e.clientX : e.touches[0].clientX;
-      let position = offsetX - rect.left;
-
-      // Constrain position within the container
-      if (position < 0) position = 0;
-      if (position > rect.width) position = rect.width;
-
-      overlay.style.width = position + 'px';
-      sliderHandle.style.left = position + 'px';
+    function slideFinish() {
+      /* The slider is no longer clicked */
+      clicked = 0;
+      window.removeEventListener("mousemove", slideMove);
+      window.removeEventListener("touchmove", slideMove);
     }
 
-    sliderHandle.addEventListener('mousedown', () => isDragging = true);
-    sliderHandle.addEventListener('touchstart', () => isDragging = true);
+    function slideMove(e) {
+      var pos;
+      /* If the slider is no longer clicked, exit this function */
+      if (clicked == 0) return false;
 
-    window.addEventListener('mousemove', slide);
-    window.addEventListener('touchmove', slide);
+      /* Get the cursor's x position */
+      pos = getCursorPos(e);
 
-    window.addEventListener('mouseup', () => isDragging = false);
-    window.addEventListener('touchend', () => isDragging = false);
-  </script>
+      /* Prevent the slider from sliding outside the image */
+      if (pos < 0) pos = 0;
+      if (pos > w) pos = w;
+
+      /* Execute a function that will resize the overlay image according to the cursor */
+      slide(pos);
+    }
+
+    function getCursorPos(e) {
+      var a, x = 0;
+      e = e || window.event;
+      /* Get the x positions of the image */
+      a = img.getBoundingClientRect();
+      /* Calculate the cursor's x coordinate, relative to the image */
+      x = e.pageX - a.left;
+      x = x - window.pageXOffset;
+      return x;
+    }
+
+    function slide(x) {
+      /* Resize the image */
+      img.style.width = x + "px";
+      /* Position the slider */
+      slider.style.left = (img.offsetWidth - (slider.offsetWidth / 2)) + "px";
+    }
+  }
+}
+
+/* Execute the function */
+initComparisons();
+</script>
+
 </body>
-  </html>
+</html>
