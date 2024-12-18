@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Comparison Slider</title>
+  <title>Fixed Image Comparison Slider</title>
   <style>
     body {
       margin: 0;
@@ -18,59 +18,61 @@
       position: relative;
       width: 90%;
       max-width: 800px;
-      height: 500px; /* Set a fixed height for clarity */
+      height: 500px;
       overflow: hidden;
     }
 
-    /* Static full-size left image */
-    .comparison-image img {
+    /* Static Left Image (Full Width) */
+    .comparison-container img {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
     }
 
-    .comparison-image {
+    /* Right Image Overlay */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%; /* Default starting position */
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .overlay img {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
+      object-fit: cover;
     }
 
-    /* Overlay for the right image */
-    .overlay {
-      width: 50%; /* Default starting position */
-      overflow: hidden;
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-    }
-
+    /* Slider Handle */
     .slider-handle {
       position: absolute;
       top: 0;
       bottom: 0;
-      left: 50%; /* Default position */
+      left: 50%; /* Default slider position */
       width: 5px;
       background-color: #fff;
       border-left: 2px solid #000;
       border-right: 2px solid #000;
       cursor: ew-resize;
-      z-index: 2;
-      transition: 0.1s;
+      z-index: 10;
     }
   </style>
 </head>
 <body>
   <div class="comparison-container">
-    <!-- Static Left Image -->
-    <div class="comparison-image">
-      <img src="image1.jpg" alt="Left Image">
-    </div>
+    <!-- Static Full-Size Left Image -->
+    <img src="image1.jpg" alt="Left Image">
 
     <!-- Sliding Right Image -->
-    <div class="comparison-image overlay">
+    <div class="overlay">
       <img src="image2.jpg" alt="Right Image">
     </div>
 
@@ -89,16 +91,16 @@
     function slide(event) {
       if (!isDragging) return;
 
-      // Get the mouse/touch position relative to the container
+      // Get mouse/touch position relative to the container
       const rect = container.getBoundingClientRect();
       const offsetX = event.clientX || event.touches[0].clientX;
       let position = offsetX - rect.left;
 
-      // Constrain the position within the container
+      // Constrain the position within container bounds
       if (position < 0) position = 0;
       if (position > rect.width) position = rect.width;
 
-      // Adjust the slider handle and overlay width
+      // Move the slider and resize the overlay
       sliderHandle.style.left = `${position}px`;
       overlay.style.width = `${position}px`;
     }
