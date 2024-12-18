@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fixed Image Comparison Slider</title>
+  <title>Image Comparison Slider</title>
   <style>
     body {
       margin: 0;
@@ -22,30 +22,28 @@
       overflow: hidden;
     }
 
-    /* Static Left Image (Full Width) */
-    .comparison-container img {
+    /* Full-size Left Image */
+    .comparison-image {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
     }
 
-    /* Right Image Overlay */
+    /* Overlay Image Container */
     .overlay {
       position: absolute;
       top: 0;
       left: 0;
-      width: 50%; /* Default starting position */
+      width: 50%; /* Default position of slider */
       height: 100%;
       overflow: hidden;
     }
 
-    .overlay img {
-      position: absolute;
-      top: 0;
-      left: 0;
+    /* Both images: full-size */
+    img {
+      display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -56,7 +54,7 @@
       position: absolute;
       top: 0;
       bottom: 0;
-      left: 50%; /* Default slider position */
+      left: 50%; /* Default position */
       width: 5px;
       background-color: #fff;
       border-left: 2px solid #000;
@@ -68,10 +66,12 @@
 </head>
 <body>
   <div class="comparison-container">
-    <!-- Static Full-Size Left Image -->
-    <img src="image1.jpg" alt="Left Image">
+    <!-- Full-size Left Image (Background) -->
+    <div class="comparison-image">
+      <img src="image1.jpg" alt="Left Image">
+    </div>
 
-    <!-- Sliding Right Image -->
+    <!-- Overlay with Right Image -->
     <div class="overlay">
       <img src="image2.jpg" alt="Right Image">
     </div>
@@ -87,25 +87,23 @@
 
     let isDragging = false;
 
-    // Function to move the slider
     function slide(event) {
       if (!isDragging) return;
 
-      // Get mouse/touch position relative to the container
+      // Get position relative to the container
       const rect = container.getBoundingClientRect();
       const offsetX = event.clientX || event.touches[0].clientX;
       let position = offsetX - rect.left;
 
-      // Constrain the position within container bounds
-      if (position < 0) position = 0;
-      if (position > rect.width) position = rect.width;
+      // Constrain slider within container bounds
+      position = Math.max(0, Math.min(position, rect.width));
 
-      // Move the slider and resize the overlay
+      // Update slider position and overlay width
       sliderHandle.style.left = `${position}px`;
       overlay.style.width = `${position}px`;
     }
 
-    // Mouse/touch event listeners
+    // Event listeners for slider handle
     sliderHandle.addEventListener('mousedown', () => isDragging = true);
     sliderHandle.addEventListener('touchstart', () => isDragging = true);
 
