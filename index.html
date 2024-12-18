@@ -7,7 +7,7 @@
 
 .img-comp-container {
   position: relative;
-  height: 200px; /*should be the same height as the images*/
+  height: 768px; /*should be the same height as the images*/
 }
 
 .img-comp-img {
@@ -27,8 +27,8 @@
   z-index:9;
   cursor: ew-resize;
   /*set the appearance of the slider:*/
-  width: 40px;
-  height: 40px;
+  width: 20px;
+  height: 20px;
   background-color: #2196F3;
   opacity: 0.7;
   border-radius: 50%;
@@ -57,7 +57,7 @@ function initComparisons() {
     /*insert slider*/
     img.parentElement.insertBefore(slider, img);
     /*position the slider in the middle:*/
-    slider.style.top = (h / 2) - (slider.offsetHeight / 2) + "px";
+    slider.style.top = (h / 1.1) - (slider.offsetHeight / 2) + "px";
     slider.style.left = (w / 2) - (slider.offsetWidth / 2) + "px";
     /*execute a function when the mouse button is pressed:*/
     slider.addEventListener("mousedown", slideReady);
@@ -121,10 +121,10 @@ function initComparisons() {
 
 <div class="img-comp-container">
   <div class="img-comp-img">
-    <img src="image2.jpg" width="300" height="200">
+    <img src="image2.jpg" width="886" height="768">
   </div>
   <div class="img-comp-img img-comp-overlay">
-    <img src="image1.jpg" width="300" height="200">
+    <img src="image1.jpg" width="886" height="768">
   </div>
 </div>
 
