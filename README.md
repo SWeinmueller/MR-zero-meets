@@ -1,4 +1,4 @@
 # MR-zero-meets
 Showcases of MR-zero on
 
-https://mrsources.github.io/MR-zero-meets/
+[Click here](https://raw.githack.com/SWeinmueller/MR-zero-meets/refs/heads/main/index.html)
