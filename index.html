@@ -47,6 +47,16 @@ p {
   opacity: 0.7;
   border-radius: 50%;
 }
+
+.slider-container {
+  margin: 20px;
+  display: flex;
+  align-items: center;
+}
+
+.slider {
+  margin: 0 20px;
+}
 </style>
 <script>
 function initComparisons() {
@@ -125,6 +135,17 @@ function initComparisons() {
     }
   }
 }
+
+// Function to update the image when the sliders change
+function updateImage() {
+  var firstNum = document.getElementById("first-slider").value;
+  var secondNum = document.getElementById("second-slider").value;
+  var imagePathSim = "qMR-zero\\sim\\img_" + firstNum + "_" + secondNum + ".png";
+  var imagePathMeas = "qMR-zero\\meas\\img_" + firstNum + "_" + secondNum + ".png";
+  document.getElementById("dynamic-image_sim").src = imagePathSim;
+  document.getElementById("dynamic-image_meas").src = imagePathMeas;
+}
+
 </script>
 </head>
 <body>
@@ -159,6 +180,49 @@ ORIGINAL -----------------------I---------------------- IMPROVED
   Not AI, but optimized MR acquisition. 
   We fine-tune flip angle trains end-to-end for better point spread function and artifact-free results.
 </p>
+
+<h2>Quantalizer</h2>
+MEASUREMENT -----------------------I---------------------- SIMULATION
+
+<div class="img-comp-container">
+  <div class="img-comp-img">
+    <img id="dynamic-image_sim" src="qMR-zero\\sim\\img_16_18.png" width="399" height="400" alt="Image 5">
+  </div>
+  <div class="img-comp-img img-comp-overlay">
+    <img id="dynamic-image_meas" src="qMR-zero\\meas\\img_16_18.png" width="399" height="400" alt="Image 6">
+  </div>
+</div>
+<p> Change here the slice and the contrast? </br> </p>
+
+<!-- Slider for the first number (16-25) -->
+<div class="slider-container">
+  <label for="first-slider">Contrast (0-25):</label>
+  <input type="range" id="first-slider" class="slider" min="0" max="25" value="16" onchange="updateImage()">
+  <span id="first-slider-value">16</span>
+</div>
+
+<!-- Slider for the second number (0-36) -->
+<div class="slider-container">
+  <label for="second-slider">Slice (0-36):</label>
+  <input type="range" id="second-slider" class="slider" min="0" max="36" value="18" onchange="updateImage()">
+  <span id="second-slider-value">18</span>
+</div>
+
+<script>
+// Update the initial slider value labels
+document.getElementById("first-slider-value").innerText = document.getElementById("first-slider").value;
+document.getElementById("second-slider-value").innerText = document.getElementById("second-slider").value;
+
+// Update the label when the slider value changes
+document.getElementById("first-slider").addEventListener("input", function() {
+  document.getElementById("first-slider-value").innerText = this.value;
+});
+
+document.getElementById("second-slider").addEventListener("input", function() {
+  document.getElementById("second-slider-value").innerText = this.value;
+});
+</script>
+
   
 
 <script>
